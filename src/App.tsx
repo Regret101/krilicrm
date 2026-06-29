@@ -1,8 +1,17 @@
 import { useState } from "react";
 import {
   BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, Tooltip, ResponsiveContainer, AreaChart, Area
+  XAxis, YAxis, Tooltip, ResponsiveContainer, AreaChart, Area, LineChart, Line
 } from "recharts";
+import {
+  Home, Users, ClipboardList, CreditCard, Activity as ActivityIcon, Bell, BarChart3,
+  Settings, LogOut, Phone, Moon, Sun, UserCircle2, ArrowUpRight, ArrowDownRight,
+  TrendingUp, TrendingDown, AlertTriangle, CheckCircle2, UserPlus, RotateCcw,
+  Wifi, Gauge, Zap, ArrowDown, ArrowUp, Signal, Search, Download, Plus, X,
+  MoreHorizontal, FileText, FileSpreadsheet, Eye, Trash2, Clock, Star,
+  Wallet, Receipt, RefreshCw, CalendarDays, DollarSign, ShieldAlert, Info,
+  ChevronLeft, ChevronRight, PauseCircle, UserCheck, Hourglass
+} from "lucide-react";
 
 // ─── DATA ────────────────────────────────────────────────────────────────────
 const connectionsData = [
@@ -35,19 +44,20 @@ const criticalClients = [
   { id: "1001251", name: "Васильев Андрей", issue: "Просрочен платёж", traffic: 8, total: 30, balance: 300 },
 ];
 const events = [
-  { icon: "⚠️", title: "Трафик исчерпан", desc: "У клиента Иванов Константин (ID: 1001256) закончился трафик.", time: "10:22", type: "error" },
-  { icon: "⚠️", title: "Низкий баланс", desc: "У клиента Петров Сергей (ID: 1001255) баланс менее 50 ₽.", time: "09:14", type: "warn" },
-  { icon: "✅", title: "Успешный платёж", desc: "Поступил платёж 850 ₽ от клиента Сидорова Мария (ID: 1001254).", time: "08:47", type: "ok" },
-  { icon: "👤", title: "Новый клиент", desc: "Зарегистрирован новый клиент: Васильев Андрей (ID: 1001251).", time: "Вчера", type: "info" },
-  { icon: "📊", title: "Пиковая нагрузка", desc: "Зафиксирована пиковая нагрузка на сеть: 92%.", time: "Вчера", type: "info" },
+  { title: "Трафик исчерпан", desc: "У клиента Иванов Константин (ID: 1001256) закончился трафик.", time: "10:22", type: "error" },
+  { title: "Низкий баланс", desc: "У клиента Петров Сергей (ID: 1001255) баланс менее 50 ₽.", time: "09:14", type: "warn" },
+  { title: "Успешный платёж", desc: "Поступил платёж 850 ₽ от клиента Сидорова Мария (ID: 1001254).", time: "08:47", type: "ok" },
+  { title: "Новый клиент", desc: "Зарегистрирован новый клиент: Васильев Андрей (ID: 1001251).", time: "Вчера", type: "info" },
+  { title: "Пиковая нагрузка", desc: "Зафиксирована пиковая нагрузка на сеть: 92%.", time: "Вчера", type: "info" },
 ];
+const mkSpark = (base, variance) => Array.from({ length: 7 }, (_, i) => ({ i, v: Math.max(2, Math.round(base + Math.sin(i * 1.3 + base) * variance + (i % 3) * variance * 0.4)) }));
 const clientsData = [
-  { id: "1001256", name: "Иванов Константин", addr: "ул. Ленина, 15-32", phone: "+7 (999) 123-45-67", email: "ivanov.k@mail.ru", tariff: "Ultra 500", speed: "500 Мбит/с", contract: "Действует", contractEnd: "до 24.05.2025", balance: 0, debt: 850, traffic: 0, trafficTotal: 500, status: "Трафик исчерпан", statusColor: "#EF4444", initials: "ИК", color: "#EF4444" },
-  { id: "1001255", name: "Петров Сергей", addr: "ул. Советская, 8-10", phone: "+7 (999) 987-65-43", email: "petrov.s@mail.ru", tariff: "Turbo 200", speed: "200 Мбит/с", contract: "Действует", contractEnd: "до 12.06.2025", balance: 350, debt: 0, traffic: 5, trafficTotal: 200, status: "Низкий баланс", statusColor: "#F59E0B", initials: "ПС", color: "#F59E0B" },
-  { id: "1001254", name: "Сидорова Мария", addr: "ул. Пушкина, 23-45", phone: "+7 (999) 456-78-90", email: "sidorova.m@mail.ru", tariff: "Optima 100", speed: "100 Мбит/с", contract: "Действует", contractEnd: "до 01.07.2025", balance: 650, debt: 0, traffic: 15, trafficTotal: 100, status: "Активен", statusColor: "#10B981", initials: "СМ", color: "#3B82F6" },
-  { id: "1001253", name: "Алексеев Кирилл", addr: "ул. Гагарина, 12-7", phone: "+7 (999) 321-09-87", email: "alekseev.k@mail.ru", tariff: "Start 50", speed: "50 Мбит/с", contract: "Действует", contractEnd: "до 15.08.2025", balance: 550, debt: 0, traffic: 32, trafficTotal: 50, status: "Активен", statusColor: "#10B981", initials: "АК", color: "#10B981" },
-  { id: "1001252", name: "Николаев Виктор", addr: "ул. Мира, 9-11", phone: "+7 (999) 654-32-10", email: "nikolaev.v@mail.ru", tariff: "Optima 100", speed: "100 Мбит/с", contract: "Приостановлен", contractEnd: "с 28.04.2025", balance: 0, debt: 1200, traffic: 0, trafficTotal: 100, status: "Заблокирован", statusColor: "#EF4444", initials: "НВ", color: "#8B5CF6" },
-  { id: "1001251", name: "Васильев Андрей", addr: "ул. Южная, 5-3", phone: "+7 (999) 555-11-22", email: "vasilev.a@mail.ru", tariff: "Light 30", speed: "30 Мбит/с", contract: "Действует", contractEnd: "до 22.07.2025", balance: 300, debt: 0, traffic: 8, trafficTotal: 30, status: "Активен", statusColor: "#10B981", initials: "БА", color: "#6366F1" },
+  { id: "1001256", name: "Иванов Константин", addr: "ул. Ленина, 15-32", phone: "+7 (999) 123-45-67", email: "ivanov.k@mail.ru", tariff: "Ultra 500", speed: "500 Мбит/с", contract: "Действует", contractEnd: "до 24.05.2025", balance: 0, debt: 850, traffic: 0, trafficTotal: 500, status: "Трафик исчерпан", statusColor: "#EF4444", initials: "ИК", color: "#EF4444", spark: mkSpark(20, 14) },
+  { id: "1001255", name: "Петров Сергей", addr: "ул. Советская, 8-10", phone: "+7 (999) 987-65-43", email: "petrov.s@mail.ru", tariff: "Turbo 200", speed: "200 Мбит/с", contract: "Действует", contractEnd: "до 12.06.2025", balance: 350, debt: 0, traffic: 5, trafficTotal: 200, status: "Низкий баланс", statusColor: "#F59E0B", initials: "ПС", color: "#F59E0B", spark: mkSpark(45, 18) },
+  { id: "1001254", name: "Сидорова Мария", addr: "ул. Пушкина, 23-45", phone: "+7 (999) 456-78-90", email: "sidorova.m@mail.ru", tariff: "Optima 100", speed: "100 Мбит/с", contract: "Действует", contractEnd: "до 01.07.2025", balance: 650, debt: 0, traffic: 15, trafficTotal: 100, status: "Активен", statusColor: "#10B981", initials: "СМ", color: "#3B82F6", spark: mkSpark(60, 20) },
+  { id: "1001253", name: "Алексеев Кирилл", addr: "ул. Гагарина, 12-7", phone: "+7 (999) 321-09-87", email: "alekseev.k@mail.ru", tariff: "Start 50", speed: "50 Мбит/с", contract: "Действует", contractEnd: "до 15.08.2025", balance: 550, debt: 0, traffic: 32, trafficTotal: 50, status: "Активен", statusColor: "#10B981", initials: "АК", color: "#10B981", spark: mkSpark(55, 22) },
+  { id: "1001252", name: "Николаев Виктор", addr: "ул. Мира, 9-11", phone: "+7 (999) 654-32-10", email: "nikolaev.v@mail.ru", tariff: "Optima 100", speed: "100 Мбит/с", contract: "Приостановлен", contractEnd: "с 28.04.2025", balance: 0, debt: 1200, traffic: 0, trafficTotal: 100, status: "Заблокирован", statusColor: "#EF4444", initials: "НВ", color: "#8B5CF6", spark: mkSpark(10, 6) },
+  { id: "1001251", name: "Васильев Андрей", addr: "ул. Южная, 5-3", phone: "+7 (999) 555-11-22", email: "vasilev.a@mail.ru", tariff: "Light 30", speed: "30 Мбит/с", contract: "Действует", contractEnd: "до 22.07.2025", balance: 300, debt: 0, traffic: 8, trafficTotal: 30, status: "Активен", statusColor: "#10B981", initials: "БА", color: "#6366F1", spark: mkSpark(48, 16) },
 ];
 const tariffsData = [
   { name: "Ultra 500", speed: "1000 Мбит/с", traffic: "Безлимит", price: "1 200 ₽/мес", clients: 352, pct: 28, avg: "742 ГБ", income: "422 400 ₽", status: "Активен" },
@@ -82,18 +92,18 @@ const trafficTypes = [
   { name: "Другое", value: 7.6, color: "#6B7280" },
 ];
 const notificationsData = [
-  { id: 1, icon: "⚠️", title: "Трафик исчерпан", desc: "У клиента Иванов Константин (ID: 1001256) закончился трафик.", time: "Сегодня, 10:22", type: "error", read: false },
-  { id: 2, icon: "⚠️", title: "Низкий баланс", desc: "У клиента Петров Сергей (ID: 1001255) баланс менее 50 ₽.", time: "Сегодня, 09:14", type: "warn", read: false },
-  { id: 3, icon: "⚠️", title: "Просрочен платёж", desc: "Клиент Николаев Виктор (ID: 1001252) не оплатил счёт уже 12 дней.", time: "Сегодня, 08:55", type: "error", read: false },
-  { id: 4, icon: "✅", title: "Успешный платёж", desc: "Поступил платёж 850 ₽ от клиента Сидорова Мария (ID: 1001254).", time: "Сегодня, 08:47", type: "ok", read: false },
-  { id: 5, icon: "👤", title: "Новый клиент", desc: "Зарегистрирован новый клиент: Васильев Андрей (ID: 1001251).", time: "Вчера, 17:30", type: "info", read: true },
-  { id: 6, icon: "📊", title: "Пиковая нагрузка", desc: "Зафиксирована пиковая нагрузка на сеть: 92%.", time: "Вчера, 14:10", type: "warn", read: true },
-  { id: 7, icon: "🔄", title: "Автоплатёж выполнен", desc: "Автоматическое списание 1 200 ₽ за тариф Ultra 500 (Иванов К.).", time: "Вчера, 10:00", type: "ok", read: true },
-  { id: 8, icon: "📡", title: "Перегрузка узла", desc: "Сетевой узел №3 работает на 95% мощности.", time: "14.05, 22:40", type: "error", read: true },
-  { id: 9, icon: "✅", title: "Тариф добавлен", desc: "Новый тариф «Night 100» успешно добавлен в систему.", time: "14.05, 11:15", type: "ok", read: true },
-  { id: 10, icon: "👤", title: "Новый клиент", desc: "Зарегистрирован новый клиент: Кузнецов Дмитрий (ID: 1001250).", time: "13.05, 09:20", type: "info", read: true },
-  { id: 11, icon: "⚠️", title: "Низкий баланс", desc: "У клиента Алексеев Кирилл (ID: 1001253) баланс менее 100 ₽.", time: "12.05, 16:33", type: "warn", read: true },
-  { id: 12, icon: "🔒", title: "Клиент заблокирован", desc: "Клиент Николаев Виктор (ID: 1001252) заблокирован за неоплату.", time: "12.05, 09:00", type: "error", read: true },
+  { id: 1, title: "Трафик исчерпан", desc: "У клиента Иванов Константин (ID: 1001256) закончился трафик.", time: "Сегодня, 10:22", type: "error", read: false },
+  { id: 2, title: "Низкий баланс", desc: "У клиента Петров Сергей (ID: 1001255) баланс менее 50 ₽.", time: "Сегодня, 09:14", type: "warn", read: false },
+  { id: 3, title: "Просрочен платёж", desc: "Клиент Николаев Виктор (ID: 1001252) не оплатил счёт уже 12 дней.", time: "Сегодня, 08:55", type: "error", read: false },
+  { id: 4, title: "Успешный платёж", desc: "Поступил платёж 850 ₽ от клиента Сидорова Мария (ID: 1001254).", time: "Сегодня, 08:47", type: "ok", read: false },
+  { id: 5, title: "Новый клиент", desc: "Зарегистрирован новый клиент: Васильев Андрей (ID: 1001251).", time: "Вчера, 17:30", type: "info", read: true },
+  { id: 6, title: "Пиковая нагрузка", desc: "Зафиксирована пиковая нагрузка на сеть: 92%.", time: "Вчера, 14:10", type: "warn", read: true },
+  { id: 7, title: "Автоплатёж выполнен", desc: "Автоматическое списание 1 200 ₽ за тариф Ultra 500 (Иванов К.).", time: "Вчера, 10:00", type: "ok", read: true },
+  { id: 8, title: "Перегрузка узла", desc: "Сетевой узел №3 работает на 95% мощности.", time: "14.05, 22:40", type: "error", read: true },
+  { id: 9, title: "Тариф добавлен", desc: "Новый тариф «Night 100» успешно добавлен в систему.", time: "14.05, 11:15", type: "ok", read: true },
+  { id: 10, title: "Новый клиент", desc: "Зарегистрирован новый клиент: Кузнецов Дмитрий (ID: 1001250).", time: "13.05, 09:20", type: "info", read: true },
+  { id: 11, title: "Низкий баланс", desc: "У клиента Алексеев Кирилл (ID: 1001253) баланс менее 100 ₽.", time: "12.05, 16:33", type: "warn", read: true },
+  { id: 12, title: "Клиент заблокирован", desc: "Клиент Николаев Виктор (ID: 1001252) заблокирован за неоплату.", time: "12.05, 09:00", type: "error", read: true },
 ];
 const reportsData = [
   { name: "Отчёт по доходам — Май 2025", type: "Финансы", date: "01.06.2025", size: "245 КБ", format: "PDF" },
@@ -113,10 +123,11 @@ const churnData = [
 ];
 
 // ─── THEME ───────────────────────────────────────────────────────────────────
+const SHADOW = "0 1px 2px rgba(16,24,40,0.04), 0 1px 3px rgba(16,24,40,0.06)";
 const T = {
   light: {
-    bg: "#F3F4F6", card: "#fff", sidebar: "#fff", header: "#fff",
-    text: "#111827", sub: "#6B7280", border: "#F3F4F6",
+    bg: "#F7F8FA", card: "#fff", sidebar: "#fff", header: "#fff",
+    text: "#111827", sub: "#6B7280", border: "#EEF0F3",
     navHover: "#EFF6FF", navActive: "#EFF6FF", navActiveText: "#3B82F6",
     input: "#fff", inputBorder: "#E5E7EB", tableHead: "#F9FAFB",
   },
@@ -129,15 +140,37 @@ const T = {
 };
 
 // ─── COMPONENTS ──────────────────────────────────────────────────────────────
-const KpiCard = ({ label, value, sub, subColor, icon, iconBg, t }) => (
-  <div style={{ background: t.card, borderRadius: 12, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 4px rgba(0,0,0,0.08)", flex: 1, minWidth: 0 }}>
-    <div>
-      <div style={{ fontSize: 12, color: t.sub, marginBottom: 4 }}>{label}</div>
-      <div style={{ fontSize: 22, fontWeight: 700, color: t.text, lineHeight: 1.1 }}>{value}</div>
-      {sub && <div style={{ fontSize: 11, color: subColor || "#10B981", marginTop: 3 }}>{sub}</div>}
+const KpiCard = ({ label, value, sub, subColor, icon, iconBg, iconColor, t, trend }) => (
+  <div style={{ background: t.card, borderRadius: 14, padding: "16px 18px", display: "flex", alignItems: "flex-start", justifyContent: "space-between", boxShadow: SHADOW, border: `1px solid ${t.border}`, flex: 1, minWidth: 0 }}>
+    <div style={{ minWidth: 0 }}>
+      <div style={{ fontSize: 12, color: t.sub, marginBottom: 6, fontWeight: 500, whiteSpace: "nowrap" }}>{label}</div>
+      <div style={{ fontSize: 22, fontWeight: 700, color: t.text, lineHeight: 1.1, letterSpacing: "-0.3px" }}>{value}</div>
+      {sub && (
+        <div style={{ fontSize: 11.5, color: subColor || "#16A34A", marginTop: 6, display: "flex", alignItems: "center", gap: 3, fontWeight: 600 }}>
+          {trend === "up" && <ArrowUpRight size={12} strokeWidth={2.5} />}
+          {trend === "down" && <ArrowDownRight size={12} strokeWidth={2.5} />}
+          <span style={{ fontWeight: 400, color: t.sub }}>{sub}</span>
+        </div>
+      )}
     </div>
-    {icon && <div style={{ width: 40, height: 40, borderRadius: 10, background: iconBg || "#EFF6FF", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{icon}</div>}
+    {icon && (
+      <div style={{ width: 38, height: 38, borderRadius: 10, background: iconBg || "#EFF6FF", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+        {icon}
+      </div>
+    )}
   </div>
+);
+
+const IconBadge = ({ icon, bg }) => (
+  <div style={{ width: 38, height: 38, borderRadius: 10, background: bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{icon}</div>
+);
+
+const Sparkline = ({ data, color }) => (
+  <ResponsiveContainer width={84} height={32}>
+    <LineChart data={data}>
+      <Line type="monotone" dataKey="v" stroke={color} strokeWidth={1.75} dot={false} isAnimationActive={false} />
+    </LineChart>
+  </ResponsiveContainer>
 );
 
 const Badge = ({ text, color, bg }) => (
@@ -150,7 +183,7 @@ const Modal = ({ title, onClose, children, t }) => (
     <div style={{ background: t.card, borderRadius: 16, padding: 28, width: 480, boxShadow: "0 20px 60px rgba(0,0,0,0.3)", maxHeight: "80vh", overflowY: "auto" }} onClick={e => e.stopPropagation()}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
         <span style={{ fontWeight: 700, fontSize: 17, color: t.text }}>{title}</span>
-        <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: t.sub }}>✕</button>
+        <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: t.sub, display: "flex" }}><X size={20} /></button>
       </div>
       {children}
     </div>
@@ -175,19 +208,22 @@ function Dashboard({ setPage, t }) {
   return (
     <div style={{ padding: "24px 28px", display: "flex", flexDirection: "column", gap: 20 }}>
       <div style={{ display: "flex", gap: 12 }}>
-        <KpiCard t={t} label="Всего клиентов" value="1 256" sub="+18 за месяц" icon="👥" iconBg="#EFF6FF" />
-        <KpiCard t={t} label="Активных сейчас" value="823" sub="65.5% от всех" icon="🟢" iconBg="#F0FDF4" />
-        <KpiCard t={t} label="ARPU (месяц)" value="582,45 ₽" sub="+4.3% к прошл. месяцу" icon="📊" iconBg="#F5F3FF" />
-        <KpiCard t={t} label="Churn Rate" value="2.45%" sub="-0.8% к прошл. месяцу" subColor="#10B981" icon="📉" iconBg="#FFF7ED" />
-        <KpiCard t={t} label="Доход за месяц" value="732 541 ₽" sub="+6.1% к прошл. месяцу" icon="💳" iconBg="#EFF6FF" />
-        <div style={{ background: t.card, borderRadius: 12, padding: "16px 20px", boxShadow: "0 1px 4px rgba(0,0,0,0.08)", flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 12, color: "#EF4444", fontWeight: 600 }}>Критические клиенты</div>
-          <div style={{ fontSize: 28, fontWeight: 700, color: "#EF4444" }}>24</div>
-          <div style={{ fontSize: 11, color: t.sub }}>Требуют внимания</div>
+        <KpiCard t={t} label="Всего клиентов" value="1 256" sub="+18 за месяц" trend="up" icon={<Users size={18} color="#3B82F6" />} iconBg="#EFF6FF" />
+        <KpiCard t={t} label="Активных сейчас" value="823" sub="65.5% от всех" trend="up" icon={<CheckCircle2 size={18} color="#10B981" />} iconBg="#F0FDF4" />
+        <KpiCard t={t} label="ARPU (месяц)" value="582,45 ₽" sub="+4.3% к прошл. месяцу" trend="up" icon={<BarChart3 size={18} color="#8B5CF6" />} iconBg="#F5F3FF" />
+        <KpiCard t={t} label="Churn Rate" value="2.45%" sub="-0.8% к прошл. месяцу" trend="down" subColor="#10B981" icon={<TrendingDown size={18} color="#F59E0B" />} iconBg="#FFF7ED" />
+        <KpiCard t={t} label="Доход за месяц" value="732 541 ₽" sub="+6.1% к прошл. месяцу" trend="up" icon={<Wallet size={18} color="#3B82F6" />} iconBg="#EFF6FF" />
+        <div style={{ background: "linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%)", borderRadius: 14, padding: "16px 18px", boxShadow: SHADOW, border: "1px solid #FECACA", flex: 1, minWidth: 0, display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ fontSize: 12, color: "#DC2626", fontWeight: 600 }}>Критические клиенты</div>
+            <div style={{ fontSize: 26, fontWeight: 700, color: "#DC2626", marginTop: 4 }}>24</div>
+            <div style={{ fontSize: 11, color: "#B91C1C", marginTop: 4 }}>Требуют внимания</div>
+          </div>
+          <IconBadge icon={<AlertTriangle size={18} color="#DC2626" />} bg="#FEE2E2" />
         </div>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-        <div style={{ background: t.card, borderRadius: 12, padding: 20, boxShadow: "0 1px 4px rgba(0,0,0,0.08)" }}>
+        <div style={{ background: t.card, borderRadius: 14, padding: 20, boxShadow: SHADOW, border: `1px solid ${t.border}` }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
             <span style={{ fontWeight: 600, fontSize: 15, color: t.text }}>Подключения клиентов</span>
             <span style={{ fontSize: 12, color: t.sub }}>Всего новых: <b style={{ color: "#3B82F6" }}>78</b></span>
@@ -196,35 +232,41 @@ function Dashboard({ setPage, t }) {
             <AreaChart data={connectionsData}>
               <defs>
                 <linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.15} />
+                  <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.25} />
                   <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <XAxis dataKey="d" tick={{ fontSize: 10, fill: t.sub }} tickLine={false} axisLine={false} interval={3} />
               <YAxis tick={{ fontSize: 10, fill: t.sub }} tickLine={false} axisLine={false} />
-              <Tooltip contentStyle={{ background: t.card, border: `1px solid ${t.border}`, color: t.text }} />
-              <Area type="monotone" dataKey="v" stroke="#3B82F6" fill="url(#cg)" strokeWidth={2} dot={{ r: 3, fill: "#3B82F6" }} />
+              <Tooltip contentStyle={{ background: t.card, border: `1px solid ${t.border}`, borderRadius: 8, color: t.text, fontSize: 12 }} />
+              <Area type="monotone" dataKey="v" stroke="#3B82F6" fill="url(#cg)" strokeWidth={2.5} dot={{ r: 0 }} activeDot={{ r: 4, fill: "#3B82F6" }} />
             </AreaChart>
           </ResponsiveContainer>
         </div>
-        <div style={{ background: t.card, borderRadius: 12, padding: 20, boxShadow: "0 1px 4px rgba(0,0,0,0.08)" }}>
-          <div style={{ fontWeight: 600, fontSize: 15, marginBottom: 16, color: t.text }}>Потребление трафика</div>
+        <div style={{ background: t.card, borderRadius: 14, padding: 20, boxShadow: SHADOW, border: `1px solid ${t.border}` }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <span style={{ fontWeight: 600, fontSize: 15, color: t.text }}>Потребление трафика</span>
+            <div style={{ display: "flex", gap: 12, fontSize: 11, color: t.sub }}>
+              <span style={{ display: "flex", alignItems: "center", gap: 4 }}><span style={{ width: 8, height: 8, borderRadius: 2, background: "#10B981", display: "inline-block" }} />Входящий</span>
+              <span style={{ display: "flex", alignItems: "center", gap: 4 }}><span style={{ width: 8, height: 8, borderRadius: 2, background: "#3B82F6", display: "inline-block" }} />Исходящий</span>
+            </div>
+          </div>
           <ResponsiveContainer width="100%" height={180}>
-            <BarChart data={trafficData}>
+            <BarChart data={trafficData} barCategoryGap={18}>
               <XAxis dataKey="d" tick={{ fontSize: 10, fill: t.sub }} tickLine={false} axisLine={false} />
               <YAxis tick={{ fontSize: 10, fill: t.sub }} tickLine={false} axisLine={false} />
-              <Tooltip contentStyle={{ background: t.card, border: `1px solid ${t.border}`, color: t.text }} />
-              <Bar dataKey="inc" fill="#10B981" stackId="a" name="Входящий (ГБ)" />
+              <Tooltip contentStyle={{ background: t.card, border: `1px solid ${t.border}`, borderRadius: 8, color: t.text, fontSize: 12 }} />
+              <Bar dataKey="inc" fill="#10B981" stackId="a" name="Входящий (ГБ)" radius={[0, 0, 3, 3]} />
               <Bar dataKey="out" fill="#3B82F6" stackId="a" name="Исходящий (ГБ)" radius={[3, 3, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
-        <div style={{ background: t.card, borderRadius: 12, padding: 20, boxShadow: "0 1px 4px rgba(0,0,0,0.08)" }}>
+        <div style={{ background: t.card, borderRadius: 14, padding: 20, boxShadow: SHADOW, border: `1px solid ${t.border}` }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
             <span style={{ fontWeight: 600, fontSize: 14, color: t.text }}>Топ-5 критических клиентов</span>
-            <button onClick={() => setPage("clients")} style={{ fontSize: 12, color: "#3B82F6", background: "none", border: "1px solid #3B82F6", borderRadius: 6, padding: "3px 10px", cursor: "pointer" }}>Все критические</button>
+            <button onClick={() => setPage("clients")} style={{ fontSize: 12, color: "#3B82F6", background: "none", border: "1px solid #BFDBFE", borderRadius: 6, padding: "3px 10px", cursor: "pointer", fontWeight: 500 }}>Все критические</button>
           </div>
           <table style={{ width: "100%", fontSize: 12, borderCollapse: "collapse" }}>
             <thead><tr style={{ color: t.sub, textAlign: "left" }}>
@@ -238,37 +280,42 @@ function Dashboard({ setPage, t }) {
                   <div style={{ fontWeight: 600, color: t.text }}>{c.name}</div>
                   <div style={{ color: t.sub }}>ID: {c.id}</div>
                 </td>
-                <td style={{ color: "#EF4444", fontWeight: 500 }}>{c.issue}</td>
-                <td style={{ fontWeight: 600, color: c.balance === 0 ? "#EF4444" : t.text }}>{c.balance} ₽</td>
+                <td style={{ color: "#DC2626", fontWeight: 500 }}>{c.issue}</td>
+                <td style={{ fontWeight: 600, color: c.balance === 0 ? "#DC2626" : t.text }}>{c.balance} ₽</td>
               </tr>
             ))}</tbody>
           </table>
         </div>
-        <div style={{ background: t.card, borderRadius: 12, padding: 20, boxShadow: "0 1px 4px rgba(0,0,0,0.08)" }}>
+        <div style={{ background: t.card, borderRadius: 14, padding: 20, boxShadow: SHADOW, border: `1px solid ${t.border}` }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
             <span style={{ fontWeight: 600, fontSize: 14, color: t.text }}>Последние события</span>
-            <button onClick={() => setPage("notifications")} style={{ fontSize: 12, color: "#3B82F6", background: "none", border: "1px solid #3B82F6", borderRadius: 6, padding: "3px 10px", cursor: "pointer" }}>Все события</button>
+            <button onClick={() => setPage("notifications")} style={{ fontSize: 12, color: "#3B82F6", background: "none", border: "1px solid #BFDBFE", borderRadius: 6, padding: "3px 10px", cursor: "pointer", fontWeight: 500 }}>Все события</button>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {events.map((e, i) => (
-              <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                <span style={{ fontSize: 16 }}>{e.icon}</span>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 600, fontSize: 12, color: t.text }}>{e.title}</div>
-                  <div style={{ fontSize: 11, color: t.sub }}>{e.desc}</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
+            {events.map((e, i) => {
+              const cfg = { error: { Icon: AlertTriangle, color: "#DC2626", bg: "#FEE2E2" }, warn: { Icon: AlertTriangle, color: "#D97706", bg: "#FEF3C7" }, ok: { Icon: CheckCircle2, color: "#16A34A", bg: "#DCFCE7" }, info: { Icon: Info, color: "#2563EB", bg: "#EFF6FF" } }[e.type];
+              return (
+                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                  <div style={{ width: 28, height: 28, borderRadius: 8, background: cfg.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <cfg.Icon size={14} color={cfg.color} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 600, fontSize: 12, color: t.text }}>{e.title}</div>
+                    <div style={{ fontSize: 11, color: t.sub }}>{e.desc}</div>
+                  </div>
+                  <span style={{ fontSize: 11, color: t.sub, whiteSpace: "nowrap" }}>{e.time}</span>
                 </div>
-                <span style={{ fontSize: 11, color: t.sub, whiteSpace: "nowrap" }}>{e.time}</span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
-        <div style={{ background: t.card, borderRadius: 12, padding: 20, boxShadow: "0 1px 4px rgba(0,0,0,0.08)" }}>
+        <div style={{ background: t.card, borderRadius: 14, padding: 20, boxShadow: SHADOW, border: `1px solid ${t.border}` }}>
           <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 10, color: t.text }}>Распределение по тарифам</div>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ position: "relative", width: 120, height: 120 }}>
+            <div style={{ position: "relative", width: 120, height: 120, flexShrink: 0 }}>
               <ResponsiveContainer width={120} height={120}>
                 <PieChart>
-                  <Pie data={pieData} cx={55} cy={55} innerRadius={35} outerRadius={55} dataKey="value" stroke="none">
+                  <Pie data={pieData} cx={55} cy={55} innerRadius={36} outerRadius={56} paddingAngle={2} dataKey="value" stroke="none" cornerRadius={3}>
                     {pieData.map((e, i) => <Cell key={i} fill={e.color} />)}
                   </Pie>
                 </PieChart>
@@ -278,17 +325,18 @@ function Dashboard({ setPage, t }) {
                 <div style={{ fontSize: 15, fontWeight: 700, color: t.text }}>1 256</div>
               </div>
             </div>
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 5 }}>
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 6 }}>
               {pieData.map((e, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12 }}>
-                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: e.color }} />
+                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: e.color, flexShrink: 0 }} />
                   <span style={{ flex: 1, color: t.text }}>{e.name}</span>
-                  <span style={{ color: t.sub }}>{Math.round(e.value / 12.56)}%</span>
+                  <span style={{ color: t.sub, fontWeight: 600 }}>{Math.round(e.value / 12.56)}%</span>
+                  <span style={{ color: t.sub, fontSize: 11, minWidth: 26, textAlign: "right" }}>{e.value}</span>
                 </div>
               ))}
             </div>
           </div>
-          <div style={{ marginTop: 10, fontSize: 12, color: t.sub }}>Самый популярный: <b style={{ color: "#3B82F6" }}>Ultra 500 (28%)</b></div>
+          <div style={{ marginTop: 12, fontSize: 12, color: t.sub, paddingTop: 10, borderTop: `1px solid ${t.border}` }}>Самый популярный тариф: <b style={{ color: "#3B82F6" }}>Ultra 500 (28%)</b></div>
         </div>
       </div>
     </div>
@@ -316,8 +364,8 @@ function Clients({ t }) {
     const c = selected;
     return (
       <div style={{ padding: "24px 28px" }}>
-        <button onClick={() => setSelected(null)} style={{ marginBottom: 16, background: "none", border: "none", cursor: "pointer", color: "#3B82F6", fontSize: 14 }}>← Назад к списку</button>
-        <div style={{ background: t.card, borderRadius: 12, padding: 24, boxShadow: "0 1px 4px rgba(0,0,0,0.08)" }}>
+        <button onClick={() => setSelected(null)} style={{ marginBottom: 16, background: "none", border: "none", cursor: "pointer", color: "#3B82F6", fontSize: 14, display: "flex", alignItems: "center", gap: 6, fontWeight: 500 }}><ChevronLeft size={16} /> Назад к списку</button>
+        <div style={{ background: t.card, borderRadius: 14, padding: 24, boxShadow: SHADOW, border: `1px solid ${t.border}` }}>
           <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20 }}>
             <div style={{ width: 56, height: 56, borderRadius: "50%", background: c.color, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 18 }}>{c.initials}</div>
             <div>
@@ -362,33 +410,36 @@ function Clients({ t }) {
           <Field t={t} label="Способ оплаты" options={["Автоплатёж", "СБП", "Баланс"]} />
           <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
             <button onClick={handleSave} style={{ flex: 1, background: "#3B82F6", color: "#fff", border: "none", borderRadius: 8, padding: "10px 0", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
-              {saved ? "✅ Сохранено!" : "Сохранить"}
+              {saved ? <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}><CheckCircle2 size={15} /> Сохранено!</span> : "Сохранить"}
             </button>
             <button onClick={() => setShowModal(false)} style={{ flex: 1, background: t.border, color: t.sub, border: "none", borderRadius: 8, padding: "10px 0", fontSize: 14, cursor: "pointer" }}>Отмена</button>
           </div>
         </Modal>
       )}
       <div style={{ display: "flex", gap: 12, marginBottom: 20, alignItems: "center" }}>
-        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Поиск по ФИО, ID, телефону..." style={{ padding: "8px 14px", borderRadius: 8, border: `1px solid ${t.inputBorder}`, fontSize: 13, flex: 1, background: t.input, color: t.text }} />
+        <div style={{ position: "relative", flex: 1 }}>
+          <Search size={15} color={t.sub} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }} />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Поиск по ФИО, ID, телефону, адресу..." style={{ padding: "8px 14px 8px 34px", borderRadius: 8, border: `1px solid ${t.inputBorder}`, fontSize: 13, width: "100%", background: t.input, color: t.text, boxSizing: "border-box" }} />
+        </div>
         <select value={tariffFilter} onChange={e => setTariffFilter(e.target.value)} style={{ padding: "8px 12px", borderRadius: 8, border: `1px solid ${t.inputBorder}`, fontSize: 13, background: t.input, color: t.text }}>
           {["Все", "Ultra 500", "Turbo 200", "Optima 100", "Start 50", "Light 30", "Night 100"].map(v => <option key={v}>{v}</option>)}
         </select>
         <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ padding: "8px 12px", borderRadius: 8, border: `1px solid ${t.inputBorder}`, fontSize: 13, background: t.input, color: t.text }}>
           {["Все", "Активен", "Заблокирован", "Трафик исчерпан", "Низкий баланс"].map(v => <option key={v}>{v}</option>)}
         </select>
-        <button onClick={() => setShowModal(true)} style={{ background: "#3B82F6", color: "#fff", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 13, cursor: "pointer", fontWeight: 600, whiteSpace: "nowrap" }}>+ Добавить клиента</button>
+        <button onClick={() => setShowModal(true)} style={{ background: "#3B82F6", color: "#fff", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 13, cursor: "pointer", fontWeight: 600, whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 6 }}><Plus size={15} /> Добавить клиента</button>
       </div>
       <div style={{ display: "flex", gap: 12, marginBottom: 20 }}>
-        <KpiCard t={t} label="Всего клиентов" value="1 256" sub="+18 за месяц" icon="👥" iconBg="#EFF6FF" />
-        <KpiCard t={t} label="Активных" value="1 032" sub="82.2% от всех" icon="✅" iconBg="#F0FDF4" />
-        <KpiCard t={t} label="Новых" value="24" sub="+4.1% к прошл. месяцу" icon="🧲" iconBg="#FFF7ED" />
-        <KpiCard t={t} label="Отключённых" value="47" sub="-2.3%" subColor="#EF4444" icon="⏸️" iconBg="#FEF2F2" />
-        <KpiCard t={t} label="Критических" value="24" sub="Требуют внимания" subColor="#EF4444" icon="⚠️" iconBg="#FEF2F2" />
+        <KpiCard t={t} label="Всего клиентов" value="1 256" sub="+18 за месяц" trend="up" icon={<Users size={18} color="#3B82F6" />} iconBg="#EFF6FF" />
+        <KpiCard t={t} label="Активных" value="1 032" sub="82.2% от всех" trend="up" icon={<CheckCircle2 size={18} color="#10B981" />} iconBg="#F0FDF4" />
+        <KpiCard t={t} label="Новых" value="24" sub="+4.1% к прошл. месяцу" trend="up" icon={<UserPlus size={18} color="#F59E0B" />} iconBg="#FFF7ED" />
+        <KpiCard t={t} label="Отключённых" value="47" sub="-2.3%" subColor="#DC2626" trend="down" icon={<PauseCircle size={18} color="#DC2626" />} iconBg="#FEF2F2" />
+        <KpiCard t={t} label="Критических" value="24" sub="Требуют внимания" subColor="#DC2626" icon={<AlertTriangle size={18} color="#DC2626" />} iconBg="#FEF2F2" />
       </div>
-      <div style={{ background: t.card, borderRadius: 12, boxShadow: "0 1px 4px rgba(0,0,0,0.08)", overflow: "hidden" }}>
+      <div style={{ background: t.card, borderRadius: 14, boxShadow: SHADOW, border: `1px solid ${t.border}`, overflow: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead style={{ background: t.tableHead }}>
-            <tr>{["КЛИЕНТ / ID", "КОНТАКТЫ", "ТАРИФ", "ДОГОВОР", "ПЛАТЕЖИ", "ТРАФИК", "СТАТУС", ""].map(h => (
+            <tr>{["КЛИЕНТ / ID", "КОНТАКТЫ", "ТАРИФ", "ДОГОВОР", "ПЛАТЕЖИ", "ТРАФИК", "АКТИВНОСТЬ (7 ДНЕЙ)", "СТАТУС", ""].map(h => (
               <th key={h} style={{ padding: "10px 14px", textAlign: "left", fontSize: 11, color: t.sub, fontWeight: 600, borderBottom: `1px solid ${t.border}` }}>{h}</th>
             ))}</tr>
           </thead>
@@ -409,7 +460,7 @@ function Clients({ t }) {
               <td style={{ padding: "12px 14px" }}><div style={{ fontSize: 12, color: t.text }}>{c.phone}</div><div style={{ fontSize: 11, color: t.sub }}>{c.email}</div></td>
               <td style={{ padding: "12px 14px" }}><div style={{ fontWeight: 600, color: t.text }}>{c.tariff}</div><div style={{ fontSize: 11, color: t.sub }}>{c.speed}</div></td>
               <td style={{ padding: "12px 14px" }}><div style={{ color: c.contract === "Действует" ? "#10B981" : "#F59E0B", fontWeight: 600, fontSize: 12 }}>{c.contract}</div><div style={{ fontSize: 11, color: t.sub }}>{c.contractEnd}</div></td>
-              <td style={{ padding: "12px 14px" }}><div style={{ fontWeight: 700, color: c.balance === 0 ? "#EF4444" : t.text }}>{c.balance} ₽</div>{c.debt > 0 && <div style={{ fontSize: 11, color: "#EF4444" }}>Долг: {c.debt} ₽</div>}</td>
+              <td style={{ padding: "12px 14px" }}><div style={{ fontWeight: 700, color: c.balance === 0 ? "#DC2626" : t.text }}>{c.balance} ₽</div>{c.debt > 0 && <div style={{ fontSize: 11, color: "#DC2626" }}>Долг: {c.debt} ₽</div>}</td>
               <td style={{ padding: "12px 14px" }}>
                 <div style={{ fontSize: 12, color: t.text }}>{c.traffic} ГБ / {c.trafficTotal} ГБ</div>
                 <div style={{ height: 5, background: t.border, borderRadius: 3, marginTop: 4, width: 80 }}>
@@ -417,13 +468,26 @@ function Clients({ t }) {
                 </div>
               </td>
               <td style={{ padding: "12px 14px" }}>
+                <Sparkline data={c.spark} color={c.statusColor === "#EF4444" ? "#EF4444" : c.statusColor === "#F59E0B" ? "#F59E0B" : "#3B82F6"} />
+              </td>
+              <td style={{ padding: "12px 14px" }}>
                 <Badge text={c.status} color={c.statusColor === "#10B981" ? "#16A34A" : "#fff"} bg={c.statusColor === "#10B981" ? "#DCFCE7" : c.statusColor === "#EF4444" ? "#FEE2E2" : "#FEF3C7"} />
               </td>
-              <td style={{ padding: "12px 14px", color: t.sub }}>⋯</td>
+              <td style={{ padding: "12px 14px", color: t.sub }} onClick={e => e.stopPropagation()}><MoreHorizontal size={16} /></td>
             </tr>
           ))}</tbody>
         </table>
-        <div style={{ padding: "12px 14px", fontSize: 12, color: t.sub, borderTop: `1px solid ${t.border}` }}>Показано 1–{filtered.length} из 1 256 клиентов</div>
+        <div style={{ padding: "12px 14px", fontSize: 12, color: t.sub, borderTop: `1px solid ${t.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span>Показано 1–{filtered.length} из 1 256 клиентов</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <button style={{ width: 26, height: 26, borderRadius: 6, border: `1px solid ${t.inputBorder}`, background: t.input, color: t.sub, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><ChevronLeft size={14} /></button>
+            <button style={{ width: 26, height: 26, borderRadius: 6, border: "none", background: "#3B82F6", color: "#fff", cursor: "pointer", fontWeight: 600 }}>1</button>
+            <button style={{ width: 26, height: 26, borderRadius: 6, border: `1px solid ${t.inputBorder}`, background: t.input, color: t.text, cursor: "pointer" }}>2</button>
+            <span style={{ color: t.sub, padding: "0 2px" }}>…</span>
+            <button style={{ width: 26, height: 26, borderRadius: 6, border: `1px solid ${t.inputBorder}`, background: t.input, color: t.text, cursor: "pointer" }}>106</button>
+            <button style={{ width: 26, height: 26, borderRadius: 6, border: `1px solid ${t.inputBorder}`, background: t.input, color: t.sub, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><ChevronRight size={14} /></button>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -446,22 +510,22 @@ function Tariffs({ t }) {
           <Field t={t} label="Описание (необязательно)" placeholder="Краткое описание тарифа..." />
           <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
             <button onClick={handleSave} style={{ flex: 1, background: "#3B82F6", color: "#fff", border: "none", borderRadius: 8, padding: "10px 0", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
-              {saved ? "✅ Сохранено!" : "Сохранить"}
+              {saved ? <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}><CheckCircle2 size={15} /> Сохранено!</span> : "Сохранить"}
             </button>
             <button onClick={() => setShowModal(false)} style={{ flex: 1, background: t.border, color: t.sub, border: "none", borderRadius: 8, padding: "10px 0", fontSize: 14, cursor: "pointer" }}>Отмена</button>
           </div>
         </Modal>
       )}
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
-        <button onClick={() => setShowModal(true)} style={{ background: "#3B82F6", color: "#fff", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 13, cursor: "pointer", fontWeight: 600 }}>+ Добавить тариф</button>
+        <button onClick={() => setShowModal(true)} style={{ background: "#3B82F6", color: "#fff", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 13, cursor: "pointer", fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}><Plus size={15} /> Добавить тариф</button>
       </div>
       <div style={{ display: "flex", gap: 12, marginBottom: 20 }}>
-        <KpiCard t={t} label="Всего тарифов" value="6" sub="+1 в этом месяце" icon="📋" iconBg="#EFF6FF" />
-        <KpiCard t={t} label="Средний ARPU" value="582,45 ₽" sub="+4.3% к прошл. месяцу" icon="📊" iconBg="#F0FDF4" />
-        <KpiCard t={t} label="Самый популярный" value="Ultra 500" sub="28% всех подключений" icon="⭐" iconBg="#FFFBEB" />
-        <KpiCard t={t} label="Новых подключений" value="78" sub="+12.5% к прошл. месяцу" icon="👤" iconBg="#F5F3FF" />
+        <KpiCard t={t} label="Всего тарифов" value="6" sub="+1 в этом месяце" trend="up" icon={<ClipboardList size={18} color="#3B82F6" />} iconBg="#EFF6FF" />
+        <KpiCard t={t} label="Средний ARPU" value="582,45 ₽" sub="+4.3% к прошл. месяцу" trend="up" icon={<BarChart3 size={18} color="#10B981" />} iconBg="#F0FDF4" />
+        <KpiCard t={t} label="Самый популярный" value="Ultra 500" sub="28% всех подключений" icon={<Star size={18} color="#F59E0B" />} iconBg="#FFFBEB" />
+        <KpiCard t={t} label="Новых подключений" value="78" sub="+12.5% к прошл. месяцу" trend="up" icon={<UserPlus size={18} color="#8B5CF6" />} iconBg="#F5F3FF" />
       </div>
-      <div style={{ background: t.card, borderRadius: 12, boxShadow: "0 1px 4px rgba(0,0,0,0.08)", overflow: "hidden" }}>
+      <div style={{ background: t.card, borderRadius: 14, boxShadow: SHADOW, border: `1px solid ${t.border}`, overflow: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead style={{ background: t.tableHead }}>
             <tr>{["НАЗВАНИЕ", "СКОРОСТЬ", "ТРАФИК", "СТОИМОСТЬ", "КЛИЕНТОВ", "СРЕДНЕЕ ПОТРЕБЛ.", "ДОХОД (МЕС.)", "СТАТУС", ""].map(h => (
@@ -478,7 +542,7 @@ function Tariffs({ t }) {
               <td style={{ padding: "14px 16px", color: t.sub }}>{t2.avg}</td>
               <td style={{ padding: "14px 16px", fontWeight: 600, color: t.text }}>{t2.income}</td>
               <td style={{ padding: "14px 16px" }}><Badge text={t2.status} color={t2.status === "Активен" ? "#16A34A" : "#DC2626"} bg={t2.status === "Активен" ? "#DCFCE7" : "#FEE2E2"} /></td>
-              <td style={{ padding: "14px 16px", color: t.sub }}>⋯</td>
+              <td style={{ padding: "14px 16px", color: t.sub }}><MoreHorizontal size={16} /></td>
             </tr>
           ))}</tbody>
         </table>
@@ -502,21 +566,24 @@ function Payments({ t }) {
         <select value={opFilter} onChange={e => setOpFilter(e.target.value)} style={{ padding: "6px 12px", borderRadius: 8, border: `1px solid ${t.inputBorder}`, fontSize: 13, background: t.input, color: t.text }}>
           {["Все", "Поступление", "Списание"].map(o => <option key={o}>{o}</option>)}
         </select>
-        <button style={{ marginLeft: "auto", background: "none", border: `1px solid ${t.inputBorder}`, borderRadius: 8, padding: "6px 16px", fontSize: 13, cursor: "pointer", color: t.text }}>⬇ Экспорт</button>
+        <button style={{ marginLeft: "auto", background: "none", border: `1px solid ${t.inputBorder}`, borderRadius: 8, padding: "6px 16px", fontSize: 13, cursor: "pointer", color: t.text, display: "flex", alignItems: "center", gap: 6 }}><Download size={14} /> Экспорт</button>
       </div>
       <div style={{ display: "flex", gap: 12, marginBottom: 20 }}>
-        <KpiCard t={t} label="Всего поступлений" value="732 541 ₽" sub="+8.1%" icon="📈" iconBg="#F0FDF4" />
-        <KpiCard t={t} label="Всего списаний" value="-705 260 ₽" sub="-6.6%" subColor="#EF4444" icon="📉" iconBg="#FEF2F2" />
-        <KpiCard t={t} label="Чистый доход" value="27 281 ₽" sub="+132%" icon="💰" iconBg="#EFF6FF" />
-        <KpiCard t={t} label="Средний чек" value="585 ₽" sub="+15%" icon="🧾" iconBg="#FFFBEB" />
-        <KpiCard t={t} label="Автоплатежи" value="68%" sub="от всех платежей" icon="🔄" iconBg="#F5F3FF" />
-        <div style={{ background: t.card, borderRadius: 12, padding: "16px 20px", boxShadow: "0 1px 4px rgba(0,0,0,0.08)", flex: 1 }}>
-          <div style={{ fontSize: 12, color: t.sub }}>Просроченные</div>
-          <div style={{ fontSize: 22, fontWeight: 700, color: "#EF4444" }}>12</div>
-          <div style={{ fontSize: 11, color: t.sub }}>на сумму 18 450 ₽</div>
+        <KpiCard t={t} label="Всего поступлений" value="732 541 ₽" sub="+8.1%" trend="up" icon={<ArrowDown size={18} color="#10B981" />} iconBg="#F0FDF4" />
+        <KpiCard t={t} label="Всего списаний" value="-705 260 ₽" sub="-6.6%" subColor="#DC2626" trend="down" icon={<ArrowUp size={18} color="#DC2626" />} iconBg="#FEF2F2" />
+        <KpiCard t={t} label="Чистый доход" value="27 281 ₽" sub="+132%" trend="up" icon={<DollarSign size={18} color="#3B82F6" />} iconBg="#EFF6FF" />
+        <KpiCard t={t} label="Средний чек" value="585 ₽" sub="+15%" trend="up" icon={<Receipt size={18} color="#F59E0B" />} iconBg="#FFFBEB" />
+        <KpiCard t={t} label="Автоплатежи" value="68%" sub="от всех платежей" icon={<RefreshCw size={18} color="#8B5CF6" />} iconBg="#F5F3FF" />
+        <div style={{ background: "linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%)", borderRadius: 14, padding: "16px 18px", boxShadow: SHADOW, border: "1px solid #FECACA", flex: 1, display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ fontSize: 12, color: "#DC2626", fontWeight: 600 }}>Просроченные</div>
+            <div style={{ fontSize: 22, fontWeight: 700, color: "#DC2626", marginTop: 4 }}>12</div>
+            <div style={{ fontSize: 11, color: "#B91C1C", marginTop: 4 }}>на сумму 18 450 ₽</div>
+          </div>
+          <IconBadge icon={<Hourglass size={18} color="#DC2626" />} bg="#FEE2E2" />
         </div>
       </div>
-      <div style={{ background: t.card, borderRadius: 12, boxShadow: "0 1px 4px rgba(0,0,0,0.08)", overflow: "hidden" }}>
+      <div style={{ background: t.card, borderRadius: 14, boxShadow: SHADOW, border: `1px solid ${t.border}`, overflow: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead style={{ background: t.tableHead }}>
             <tr>{["ДАТА И ВРЕМЯ", "КЛИЕНТ", "ОПЕРАЦИЯ", "СПОСОБ ОПЛАТЫ", "СУММА", "СТАТУС", "ОПЕРАТОР", ""].map(h => (
@@ -529,10 +596,10 @@ function Payments({ t }) {
               <td style={{ padding: "14px 16px" }}><div style={{ fontWeight: 600, color: t.text }}>{p.client}</div><div style={{ fontSize: 11, color: t.sub }}>ID: {p.clientId}</div></td>
               <td style={{ padding: "14px 16px", color: p.op === "Поступление" ? "#10B981" : t.sub, fontWeight: 500 }}>{p.op}</td>
               <td style={{ padding: "14px 16px", color: t.sub }}>{p.method}</td>
-              <td style={{ padding: "14px 16px", fontWeight: 700, color: p.amount > 0 ? t.text : "#EF4444" }}>{p.amount > 0 ? `+${p.amount} ₽` : `${p.amount} ₽`}</td>
+              <td style={{ padding: "14px 16px", fontWeight: 700, color: p.amount > 0 ? t.text : "#DC2626" }}>{p.amount > 0 ? `+${p.amount} ₽` : `${p.amount} ₽`}</td>
               <td style={{ padding: "14px 16px" }}><Badge text={p.status} /></td>
               <td style={{ padding: "14px 16px", color: t.sub }}>{p.operator || "Система"}</td>
-              <td style={{ padding: "14px 16px", color: t.sub }}>⋯</td>
+              <td style={{ padding: "14px 16px", color: t.sub }}><MoreHorizontal size={16} /></td>
             </tr>
           ))}</tbody>
         </table>
@@ -546,12 +613,12 @@ function Activity({ t }) {
   return (
     <div style={{ padding: "24px 28px", display: "flex", flexDirection: "column", gap: 20 }}>
       <div style={{ display: "flex", gap: 12 }}>
-        <KpiCard t={t} label="Входящий трафик" value="2.45 ТБ" sub="+12.5%" icon="⬇️" iconBg="#F0FDF4" />
-        <KpiCard t={t} label="Исходящий трафик" value="2.76 ТБ" sub="+8.3%" icon="⬆️" iconBg="#EFF6FF" />
-        <KpiCard t={t} label="Средняя скорость" value="78.6 Мбит/с" sub="+6.7%" icon="🔄" iconBg="#F5F3FF" />
-        <KpiCard t={t} label="Пиковая нагрузка" value="152.4 Мбит/с" sub="+14.2%" icon="⚡" iconBg="#FFFBEB" />
-        <KpiCard t={t} label="Активные сессии" value="823" sub="+5.1%" icon="👥" iconBg="#EFF6FF" />
-        <KpiCard t={t} label="Потери пакетов" value="0.12%" sub="-0.03%" subColor="#10B981" icon="📶" iconBg="#FEF2F2" />
+        <KpiCard t={t} label="Входящий трафик" value="2.45 ТБ" sub="+12.5%" trend="up" icon={<ArrowDown size={18} color="#10B981" />} iconBg="#F0FDF4" />
+        <KpiCard t={t} label="Исходящий трафик" value="2.76 ТБ" sub="+8.3%" trend="up" icon={<ArrowUp size={18} color="#3B82F6" />} iconBg="#EFF6FF" />
+        <KpiCard t={t} label="Средняя скорость" value="78.6 Мбит/с" sub="+6.7%" trend="up" icon={<Gauge size={18} color="#8B5CF6" />} iconBg="#F5F3FF" />
+        <KpiCard t={t} label="Пиковая нагрузка" value="152.4 Мбит/с" sub="+14.2%" trend="up" icon={<Zap size={18} color="#F59E0B" />} iconBg="#FFFBEB" />
+        <KpiCard t={t} label="Активные сессии" value="823" sub="+5.1%" trend="up" icon={<Users size={18} color="#3B82F6" />} iconBg="#EFF6FF" />
+        <KpiCard t={t} label="Потери пакетов" value="0.12%" sub="-0.03%" subColor="#16A34A" trend="down" icon={<Signal size={18} color="#DC2626" />} iconBg="#FEF2F2" />
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 16 }}>
         <div style={{ background: t.card, borderRadius: 12, padding: 20, boxShadow: "0 1px 4px rgba(0,0,0,0.08)" }}>
@@ -645,8 +712,8 @@ function Activity({ t }) {
         </div>
       </div>
       <div style={{ fontSize:12, color:t.sub, display:"flex", justifyContent:"space-between" }}>
-        <span>ℹ️ Данные обновлены сегодня в 10:30</span>
-        <span>Следующее обновление через 5 минут 🔄</span>
+        <span style={{ display: "flex", alignItems: "center", gap: 5 }}><Info size={13} /> Данные обновлены сегодня в 10:30</span>
+        <span style={{ display: "flex", alignItems: "center", gap: 5 }}>Следующее обновление через 5 минут <RefreshCw size={13} /></span>
       </div>
     </div>
   );
@@ -669,10 +736,10 @@ function Notifications({ t }) {
   return (
     <div style={{ padding: "24px 28px" }}>
       <div style={{ display: "flex", gap: 12, marginBottom: 20 }}>
-        <KpiCard t={t} label="Всего уведомлений" value={notifs.length} sub="за последние 7 дней" icon="🔔" iconBg="#EFF6FF" />
-        <KpiCard t={t} label="Непрочитанных" value={unread} sub="Требуют внимания" subColor="#EF4444" icon="⚠️" iconBg="#FEF2F2" />
-        <KpiCard t={t} label="Критических" value={notifs.filter(x=>x.type==="error").length} sub="ошибки системы" subColor="#EF4444" icon="🚨" iconBg="#FEF2F2" />
-        <KpiCard t={t} label="Успешных" value={notifs.filter(x=>x.type==="ok").length} sub="платежи и события" icon="✅" iconBg="#F0FDF4" />
+        <KpiCard t={t} label="Всего уведомлений" value={notifs.length} sub="за последние 7 дней" icon={<Bell size={18} color="#3B82F6" />} iconBg="#EFF6FF" />
+        <KpiCard t={t} label="Непрочитанных" value={unread} sub="Требуют внимания" subColor="#DC2626" icon={<AlertTriangle size={18} color="#DC2626" />} iconBg="#FEF2F2" />
+        <KpiCard t={t} label="Критических" value={notifs.filter(x=>x.type==="error").length} sub="ошибки системы" subColor="#DC2626" icon={<ShieldAlert size={18} color="#DC2626" />} iconBg="#FEF2F2" />
+        <KpiCard t={t} label="Успешных" value={notifs.filter(x=>x.type==="ok").length} sub="платежи и события" icon={<CheckCircle2 size={18} color="#16A34A" />} iconBg="#F0FDF4" />
       </div>
 
       <div style={{ background: t.card, borderRadius: 12, boxShadow: "0 1px 4px rgba(0,0,0,0.08)", overflow: "hidden" }}>
@@ -698,7 +765,9 @@ function Notifications({ t }) {
             <div key={n.id} onClick={() => markRead(n.id)} style={{ display: "flex", alignItems: "flex-start", gap: 14, padding: "16px 20px", borderBottom: `1px solid ${t.border}`, background: !n.read ? (t.tableHead) : "transparent", cursor: "pointer", transition: "background 0.15s" }}
               onMouseEnter={e => e.currentTarget.style.background = t.tableHead}
               onMouseLeave={e => e.currentTarget.style.background = !n.read ? t.tableHead : "transparent"}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: typeBg[n.type], display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{n.icon}</div>
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: typeBg[n.type], display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                {{ error: <AlertTriangle size={17} color={typeColor[n.type]} />, warn: <AlertTriangle size={17} color={typeColor[n.type]} />, ok: <CheckCircle2 size={17} color={typeColor[n.type]} />, info: <Info size={17} color={typeColor[n.type]} /> }[n.type]}
+              </div>
               <div style={{ flex: 1 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
                   <span style={{ fontWeight: 600, fontSize: 14, color: t.text }}>{n.title}</span>
@@ -741,48 +810,48 @@ function Reports({ t }) {
   return (
     <div style={{ padding: "24px 28px" }}>
       <div style={{ display: "flex", gap: 12, marginBottom: 20 }}>
-        <KpiCard t={t} label="Всего отчётов" value="6" sub="сформировано за квартал" icon="📊" iconBg="#EFF6FF" />
-        <KpiCard t={t} label="Последний отчёт" value="01.06.2025" sub="Доходы за май" icon="📅" iconBg="#F0FDF4" />
-        <KpiCard t={t} label="Суммарный доход" value="732 541 ₽" sub="Май 2025" icon="💰" iconBg="#FFFBEB" />
-        <KpiCard t={t} label="ARPU" value="582,45 ₽" sub="+4.3% к апрелю" icon="📈" iconBg="#F5F3FF" />
+        <KpiCard t={t} label="Всего отчётов" value="6" sub="сформировано за квартал" icon={<FileText size={18} color="#3B82F6" />} iconBg="#EFF6FF" />
+        <KpiCard t={t} label="Последний отчёт" value="01.06.2025" sub="Доходы за май" icon={<CalendarDays size={18} color="#10B981" />} iconBg="#F0FDF4" />
+        <KpiCard t={t} label="Суммарный доход" value="732 541 ₽" sub="Май 2025" icon={<DollarSign size={18} color="#F59E0B" />} iconBg="#FFFBEB" />
+        <KpiCard t={t} label="ARPU" value="582,45 ₽" sub="+4.3% к апрелю" trend="up" icon={<TrendingUp size={18} color="#8B5CF6" />} iconBg="#F5F3FF" />
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 16, marginBottom: 20 }}>
-        <div style={{ background: t.card, borderRadius: 12, padding: 20, boxShadow: "0 1px 4px rgba(0,0,0,0.08)" }}>
+        <div style={{ background: t.card, borderRadius: 14, padding: 20, boxShadow: SHADOW, border: `1px solid ${t.border}` }}>
           <div style={{ fontWeight: 600, fontSize: 15, marginBottom: 16, color: t.text }}>Динамика доходов по месяцам</div>
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={monthlyRevenueData}>
               <XAxis dataKey="m" tick={{ fontSize: 12, fill: t.sub }} tickLine={false} axisLine={false} />
               <YAxis tick={{ fontSize: 10, fill: t.sub }} tickLine={false} axisLine={false} tickFormatter={v => `${Math.round(v/1000)}к`} />
-              <Tooltip contentStyle={{ background: t.card, border: `1px solid ${t.border}`, color: t.text }} formatter={v => [`${v.toLocaleString()} ₽`, "Доход"]} />
+              <Tooltip contentStyle={{ background: t.card, border: `1px solid ${t.border}`, borderRadius: 8, color: t.text, fontSize: 12 }} formatter={v => [`${v.toLocaleString()} ₽`, "Доход"]} />
               <Bar dataKey="v" fill="#3B82F6" radius={[6, 6, 0, 0]} name="Доход" />
             </BarChart>
           </ResponsiveContainer>
         </div>
-        <div style={{ background: t.card, borderRadius: 12, padding: 20, boxShadow: "0 1px 4px rgba(0,0,0,0.08)" }}>
+        <div style={{ background: t.card, borderRadius: 14, padding: 20, boxShadow: SHADOW, border: `1px solid ${t.border}` }}>
           <div style={{ fontWeight: 600, fontSize: 15, marginBottom: 16, color: t.text }}>Churn Rate по месяцам</div>
           <ResponsiveContainer width="100%" height={180}>
             <AreaChart data={churnData}>
               <defs>
                 <linearGradient id="chg" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#EF4444" stopOpacity={0.2} />
-                  <stop offset="95%" stopColor="#EF4444" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.25} />
+                  <stop offset="95%" stopColor="#F59E0B" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <XAxis dataKey="m" tick={{ fontSize: 12, fill: t.sub }} tickLine={false} axisLine={false} />
               <YAxis tick={{ fontSize: 10, fill: t.sub }} tickLine={false} axisLine={false} />
-              <Tooltip contentStyle={{ background: t.card, border: `1px solid ${t.border}`, color: t.text }} formatter={v => [`${v}%`, "Churn Rate"]} />
-              <Area type="monotone" dataKey="v" stroke="#EF4444" fill="url(#chg)" strokeWidth={2} dot={{ r: 4, fill: "#EF4444" }} />
+              <Tooltip contentStyle={{ background: t.card, border: `1px solid ${t.border}`, borderRadius: 8, color: t.text, fontSize: 12 }} formatter={v => [`${v}%`, "Churn Rate"]} />
+              <Area type="monotone" dataKey="v" stroke="#F59E0B" fill="url(#chg)" strokeWidth={2.5} dot={false} activeDot={{ r: 4, fill: "#F59E0B" }} />
             </AreaChart>
           </ResponsiveContainer>
         </div>
       </div>
 
-      <div style={{ background: t.card, borderRadius: 12, boxShadow: "0 1px 4px rgba(0,0,0,0.08)", overflow: "hidden" }}>
+      <div style={{ background: t.card, borderRadius: 14, boxShadow: SHADOW, border: `1px solid ${t.border}`, overflow: "hidden" }}>
         <div style={{ padding: "16px 20px", borderBottom: `1px solid ${t.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <span style={{ fontWeight: 600, fontSize: 15, color: t.text }}>Сохранённые отчёты</span>
-          <button onClick={() => generate("Новый отчёт")} style={{ background: "#3B82F6", color: "#fff", border: "none", borderRadius: 8, padding: "7px 16px", fontSize: 13, cursor: "pointer", fontWeight: 600 }}>
-            {generating === "Новый отчёт" ? "⏳ Генерация..." : done["Новый отчёт"] ? "✅ Готово!" : "+ Сформировать отчёт"}
+          <button onClick={() => generate("Новый отчёт")} style={{ background: "#3B82F6", color: "#fff", border: "none", borderRadius: 8, padding: "7px 16px", fontSize: 13, cursor: "pointer", fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}>
+            {generating === "Новый отчёт" ? <><Clock size={14} /> Генерация...</> : done["Новый отчёт"] ? <><CheckCircle2 size={14} /> Готово!</> : <><Plus size={15} /> Сформировать отчёт</>}
           </button>
         </div>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
@@ -794,10 +863,10 @@ function Reports({ t }) {
           <tbody>{reportsData.map((r, i) => (
             <tr key={i} style={{ borderBottom: `1px solid ${t.border}` }}>
               <td style={{ padding: "14px 16px" }}>
-                <div style={{ fontWeight: 600, color: t.text }}>📄 {r.name}</div>
+                <div style={{ fontWeight: 600, color: t.text, display: "flex", alignItems: "center", gap: 8 }}><FileSpreadsheet size={15} color={t.sub} /> {r.name}</div>
               </td>
               <td style={{ padding: "14px 16px" }}>
-                <span style={{ background: `${typeColor[r.type]}22`, color: typeColor[r.type], borderRadius: 6, padding: "2px 10px", fontSize: 12, fontWeight: 600 }}>{r.type}</span>
+                <span style={{ background: `${typeColor[r.type]}1A`, color: typeColor[r.type], borderRadius: 6, padding: "2px 10px", fontSize: 12, fontWeight: 600 }}>{r.type}</span>
               </td>
               <td style={{ padding: "14px 16px", color: t.sub }}>{r.date}</td>
               <td style={{ padding: "14px 16px", color: t.sub }}>{r.size}</td>
@@ -806,10 +875,11 @@ function Reports({ t }) {
               </td>
               <td style={{ padding: "14px 16px" }}>
                 <div style={{ display: "flex", gap: 8 }}>
-                  <button onClick={() => generate(r.name)} style={{ fontSize: 12, color: "#3B82F6", background: "none", border: "1px solid #3B82F6", borderRadius: 6, padding: "4px 12px", cursor: "pointer" }}>
-                    {generating === r.name ? "⏳..." : done[r.name] ? "✅" : "⬇ Скачать"}
+                  <button onClick={() => generate(r.name)} style={{ fontSize: 12, color: "#3B82F6", background: "none", border: "1px solid #BFDBFE", borderRadius: 6, padding: "4px 12px", cursor: "pointer", display: "flex", alignItems: "center", gap: 5, fontWeight: 500 }}>
+                    {generating === r.name ? <Clock size={13} /> : done[r.name] ? <CheckCircle2 size={13} /> : <Download size={13} />}
+                    {generating === r.name ? "..." : done[r.name] ? "Готово" : "Скачать"}
                   </button>
-                  <button style={{ fontSize: 12, color: t.sub, background: "none", border: `1px solid ${t.inputBorder}`, borderRadius: 6, padding: "4px 12px", cursor: "pointer" }}>👁 Просмотр</button>
+                  <button style={{ fontSize: 12, color: t.sub, background: "none", border: `1px solid ${t.inputBorder}`, borderRadius: 6, padding: "4px 12px", cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}><Eye size={13} /> Просмотр</button>
                 </div>
               </td>
             </tr>
@@ -822,14 +892,14 @@ function Reports({ t }) {
 
 // ─── APP SHELL ────────────────────────────────────────────────────────────────
 const NAV = [
-  { key: "dashboard", label: "Главная", icon: "🏠" },
-  { key: "clients", label: "Клиенты", icon: "👥" },
-  { key: "tariffs", label: "Тарифы", icon: "📋" },
-  { key: "payments", label: "Платежи", icon: "💳" },
-  { key: "activity", label: "Активность", icon: "📡" },
-  { key: "notifications", label: "Уведомления", icon: "🔔", badge: 4 },
-  { key: "reports", label: "Отчёты", icon: "📊" },
-  { key: "settings", label: "Настройки", icon: "⚙️" },
+  { key: "dashboard", label: "Главная", icon: Home },
+  { key: "clients", label: "Клиенты", icon: Users },
+  { key: "tariffs", label: "Тарифы", icon: ClipboardList },
+  { key: "payments", label: "Платежи", icon: CreditCard },
+  { key: "activity", label: "Активность", icon: ActivityIcon },
+  { key: "notifications", label: "Уведомления", icon: Bell, badge: 4 },
+  { key: "reports", label: "Отчёты", icon: BarChart3 },
+  { key: "settings", label: "Настройки", icon: Settings },
 ];
 
 const PAGE_TITLES = {
@@ -875,14 +945,14 @@ export default function App() {
               color: page === n.key ? t.navActiveText : t.text,
               fontWeight: page === n.key ? 600 : 400, fontSize: 13, marginBottom: 2,
             }}>
-              <span>{n.icon}</span>
+              <n.icon size={16} strokeWidth={page === n.key ? 2.4 : 2} />
               <span style={{ flex: 1, textAlign: "left" }}>{n.label}</span>
               {n.badge && <span style={{ background: "#EF4444", color: "#fff", borderRadius: 10, fontSize: 10, padding: "1px 6px", fontWeight: 700 }}>{n.badge}</span>}
             </button>
           ))}
         </div>
         <div style={{ padding: "12px 20px", borderTop: `1px solid ${t.border}` }}>
-          <button style={{ background: "none", border: "none", color: t.sub, cursor: "pointer", fontSize: 13, display: "flex", alignItems: "center", gap: 8 }}>↩ Выйти из системы</button>
+          <button style={{ background: "none", border: "none", color: t.sub, cursor: "pointer", fontSize: 13, display: "flex", alignItems: "center", gap: 8 }}><LogOut size={15} /> Выйти из системы</button>
         </div>
       </div>
 
@@ -890,13 +960,14 @@ export default function App() {
       <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
         <div style={{ background: t.header, borderBottom: `1px solid ${t.border}`, padding: "0 28px", height: 56, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, transition: "background 0.2s" }}>
           <span style={{ fontWeight: 600, fontSize: 18, color: t.text }}>{PAGE_TITLES[page]}</span>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <button onClick={() => setDark(!dark)} title={dark ? "Светлая тема" : "Тёмная тема"} style={{ background: dark ? "#334155" : "#F3F4F6", border: "none", cursor: "pointer", fontSize: 16, width: 36, height: 36, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              {dark ? "☀️" : "🌙"}
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <button title="Звонки" style={{ background: "none", border: "none", cursor: "pointer", color: t.sub, width: 34, height: 34, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }}><Phone size={18} /></button>
+            <button onClick={() => setDark(!dark)} title={dark ? "Светлая тема" : "Тёмная тема"} style={{ background: dark ? "#334155" : "#F3F4F6", border: "none", cursor: "pointer", width: 34, height: 34, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", color: dark ? "#FBBF24" : "#475569" }}>
+              {dark ? <Sun size={16} /> : <Moon size={16} />}
             </button>
             <div style={{ position: "relative" }}>
-              <button onClick={() => setPage("notifications")} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20 }}>🔔</button>
-              <span style={{ position: "absolute", top: 0, right: -2, background: "#EF4444", color: "#fff", borderRadius: 8, fontSize: 9, padding: "1px 4px", fontWeight: 700 }}>4</span>
+              <button onClick={() => setPage("notifications")} style={{ background: "none", border: "none", cursor: "pointer", color: t.sub, width: 34, height: 34, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }}><Bell size={18} /></button>
+              <span style={{ position: "absolute", top: 2, right: 2, background: "#EF4444", color: "#fff", borderRadius: 8, fontSize: 9, padding: "1px 4px", fontWeight: 700 }}>4</span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#3B82F6", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 12 }}>AU</div>
